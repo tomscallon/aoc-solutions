@@ -15,5 +15,9 @@
     "Scallon"
   ],
   "author": "Tom Scallon",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^4.0.2",
+    "prompt": "^1.0.0"
+  }
 }

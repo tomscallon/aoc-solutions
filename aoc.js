@@ -32,6 +32,7 @@ const p2 = () => {
   throw 'Not yet implemented';
 };
 
+// Export the functions.
 exports[1] = p1;
 exports[2] = p2;`;
 

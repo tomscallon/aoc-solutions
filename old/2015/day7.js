@@ -50,10 +50,10 @@ var circuit = {
 
     ( circuit.deps[ depWire ] || ( circuit.deps[ depWire ] = [] ) ).push( wire );
   },
-  
+
   isComputable: function( wire ) {
     var info = circuit.vals[ wire ];
-    
+
     return ( info.arg1 === undefined || !isNaN( info.arg1 ) || !isNaN( circuit.vals[ info.arg1 ] ) )
         && ( !isNaN( info.arg2 ) || !isNaN( circuit.vals[ info.arg2 ] ) );
   },

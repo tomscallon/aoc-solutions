@@ -88,15 +88,18 @@ const actions = {
     }
 
     let result;
+    let time;
 
     try {
+      time = Date.now();
       result = module[part]();
+      time = Date.now() - time;
     } catch (e) {
       console.error(`\nHit an error while running the code: ${e}.\n`);
       process.exit();
     }
 
-    console.log(`\nRan: ${year}, day ${day}, part ${part}\nResult: ${result}\n`);
+    console.log(`\nRan: ${year}, day ${day}, part ${part}\nTook: ${time}ms\nResult: ${result}\n`);
   }
 };
 

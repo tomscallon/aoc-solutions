@@ -5,28 +5,6 @@ const input = require('fs')
   .readFileSync(__dirname + '/input.txt', 'utf8')
   .trim();
 
-/*const nextChunk = s => {
-  //console.log(s, /^((\d)\2*)(\d*)/.exec(s))
-  const [, chunk, num, rest] = /^((\d)\2*)(\d*)/.exec(s);
-
-  return {num, count: chunk.length, rest};
-};
-
-const nextLookSay = s => {
-  let next = '';
-  let remaining = s;
-
-  while (remaining.length > 0) {
-    const {num, count, rest} = nextChunk(remaining);
-
-    next += count;
-    next += num;
-    remaining = rest;
-  }
-
-  return next;
-};*/
-
 const nextLookSay = s => {
   let next = '';
   let match;

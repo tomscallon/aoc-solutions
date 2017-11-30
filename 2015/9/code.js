@@ -1,4 +1,5 @@
 // Tom Scallon. Advent of Code 2015, day 9.
+const utils = require('../../utils.js');
 
 // Read in input.
 const parseLine = line => {
@@ -25,25 +26,6 @@ const toDistMap = (map, {p1, p2, d}) => {
   return map;
 };
 
-const permutations = (arr) => {
-  if (arr.length === 0) {
-    return [];
-  } else if (arr.length === 1) {
-    return [[arr[0]]];
-  }
-
-  let perms = [];
-
-  for (let i = 0; i < arr.length; i++) {
-    const tail = arr[i];
-    const headPerms = permutations(arr.slice(0, i).concat(arr.slice(i + 1)));
-
-    perms = perms.concat(headPerms.map(arr => arr.concat(tail)));
-  }
-
-  return perms;
-};
-
 const totalDistance = (perm, distMap) => {
   let dist = 0;
 
@@ -58,7 +40,7 @@ const p1 = () => {
   const distMap = input.reduce(toDistMap, {});
   const places = Object.keys(distMap);
 
-  return permutations(places)
+  return utils.permutations(places)
     .map(p => totalDistance(p, distMap))
     .sort((a, b) => a - b)[0];
 };
@@ -68,7 +50,7 @@ const p2 = () => {
   const distMap = input.reduce(toDistMap, {});
   const places = Object.keys(distMap);
 
-  return permutations(places)
+  return utils.permutations(places)
     .map(p => totalDistance(p, distMap))
     .sort((a, b) => b - a)[0];
 };

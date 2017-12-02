@@ -52,7 +52,7 @@ const p2 = () => {
     }
   }
 
-  return [min, count];
+  return count;
 };
 
 // Export the functions.

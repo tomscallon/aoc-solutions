@@ -1,3 +1,8 @@
+const range = (max, min = 0) =>
+  max === min ?
+    [min] :
+    [...range(max - 1, min), max];
+
 const repeat = (x, n) => n === 0 ? [] : [x].concat(repeat(x, n - 1));
 
 const permutations = (arr) => {
@@ -161,6 +166,7 @@ function* summationsUsing(a, x, {unique = false, repeat: _repeat = true, sorted 
   }
 }
 
+exports.range = range;
 exports.repeat = repeat;
 exports.permutations = permutations;
 exports.summations = summations;

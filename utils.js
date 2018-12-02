@@ -166,8 +166,53 @@ function* summationsUsing(a, x, {unique = false, repeat: _repeat = true, sorted 
   }
 }
 
+function* mToNOf(a, m, n) {
+  if (n < 0 || n < m || a.length < m) {
+    return;
+  }
+
+  m = Math.max(m, 0);
+  n = Math.min(n, a.length);
+
+  // Decide: is a[0] included?
+  // Yes:
+  for (let rest of mToNof(a.slice(1)))
+
+  // No:
+}
+
+const id = x => x;
+
+function* yieldIterable(i, f = id) {
+  for (let x of i) {
+    yield f(x);
+  }
+}
+
+function* crossProduct(h, ...t) {
+  if (t.length === 0) {
+    if (typeof h[Symbol.iterator] === 'function') {
+      yield* yieldIterable(h, x => [x]);
+    } else {
+      yield [h];
+    }
+    return;
+  }
+
+  // Otherwise, perform cross product recursiely.
+  const tailProduct = crossProduct(...t);
+  const headItems = typeof h[Symbol.iterator] === 'function' ? h : [h];
+
+  for (let tail of tailProduct) {
+    for (let head of headItems) {
+      yield [head, ...tail];
+    }
+  }
+}
+
 exports.range = range;
 exports.repeat = repeat;
 exports.permutations = permutations;
 exports.summations = summations;
 exports.summationsUsing = summationsUsing;
+exports.crossProduct = crossProduct;

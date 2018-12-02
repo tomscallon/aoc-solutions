@@ -1,20 +1,26 @@
 #! /usr/local/bin/node
+require('dotenv').config();
 
 const fs = require('fs');
 const fse = require('fs-extra');
+const https = require('https');
 const prompt = require('prompt');
+
+const FINAL_YEAR = 2018;
 
 const printUsageError = (message) => console.error(
   `Error: ${message}\n\n` +
   'Proper Usage: ./aoc.js <action> <year> <day> [part = 1]\n' +
-  '  action: \'make\' or \'run\'\n' +
-  '  year:   2015, 2016, or 2017\n' +
+  `  action: ${Object.keys(actions)}\n` +
+  `  year:   2015 to ${FINAL_YEAR}\n` +
   '  day:    an integer between 1 and 25, inclusive\n' +
   '  part:   1 or 2 (only for "run")\n'
 );
 
 const getFolderPath = (year, day) => `./${year}/${day}`;
-const getFilePath = (year, day) => `${getFolderPath(year, day)}/code.js`;
+const getCodeFilePath = (year, day) => `${getFolderPath(year, day)}/code.js`;
+const getInputFilePath = (year, day) => `${getFolderPath(year, day)}/input.txt`;
+const getAnswerFilePath = (year, day) => `${getFolderPath(year, day)}/last_answer.txt`;
 
 const createCodeFileBody = (year, day) =>
 `// Tom Scallon. Advent of Code ${year}, day ${day}.
@@ -36,16 +42,53 @@ const p2 = () => {
 exports[1] = p1;
 exports[2] = p2;`;
 
+const AOC_DOMAIN = 'https://adventofcode.com';
+const getDayURL = (year, day) => `${AOC_DOMAIN}/${year}/day/${day}`;
+const getInputURL = (year, day) => `${getDayURL(year, day)}/input`;
+const getSubmitURL = (year, day) => `${getDayURL(year, day)}/answer`;
+
+const writeFile = (path, content, successCallback = undefined) => fs.writeFile(
+  path,
+  content,
+  (err) => {
+    if (err) {
+      console.error(`Failed to write to ${path}: ${err.message}`);
+      process.exit();
+    } else if (typeof successCallback === 'function') {
+      successCallback();
+    }
+  }
+)
+
+const makeRequest = (url, options, onSuccess, onFail) => {
+  https.request(url, options, response => {
+    let data = '';
+
+    // Combine chunks into the whole response.
+    response.on('data', chunk => data += chunk);
+
+    // The whole response has been received. Call the success callback.
+    response.on('end', () => onSuccess(data));
+
+  }).on('error', err => onFail(err))
+    .end();
+}
+
 const actions = {
   make: (year, day) => {
     const folderPath = getFolderPath(year, day);
 
     fse.mkdirs(folderPath);
 
-    const filePath = getFilePath(year, day);
+    const filePath = getCodeFilePath(year, day);
 
-    const doWrite = () => fs.writeFile(filePath, createCodeFileBody(year, day));
+    const doWrite = () => writeFile(
+      filePath,
+      createCodeFileBody(year, day),
+      () => console.log(`Created solution file ${filePath}.`),
+    );
 
+    console.log(`Creating ${filePath}`);
     fs.stat(filePath, (err, stat) => {
       if (err) {
         if (err.code !== 'ENOENT') {
@@ -75,9 +118,30 @@ const actions = {
         });
       }
     });
+
+    actions.get_input(year, day);
+  },
+  get_input: (year, day) => {
+    const url = getInputURL(year, day);
+    const path = getInputFilePath(year, day);
+    console.log(`Requesting input for ${year} day ${day} from ${url}`);
+    makeRequest(
+      url,
+      {
+        headers: {
+          'cookie': `session=${process.env.SESSION_TOKEN};`,
+        },
+      },
+      input => writeFile(
+        path,
+        input,
+        () => console.log(`Successfully wrote input to ${path}`),
+      ),
+      err => console.log('Failed to get puzzle input: ' + err.message),
+    );
   },
   run: (year, day, part) => {
-    const filePath = getFilePath(year, day);
+    const filePath = getCodeFilePath(year, day);
     let module;
 
     try {
@@ -106,7 +170,7 @@ const actions = {
 // Validate the action
 const action = process.argv[2];
 
-if (action !== 'make' && action !== 'run') {
+if (!(action in actions)) {
   printUsageError(`'${action}' is not a valid action.`);
   process.exit();
 }
@@ -117,8 +181,8 @@ year = +year;
 day = +day;
 
 // Validate 'year'
-if (!year || year % 1 !== 0 || year < 2015 || year > 2017) {
-  printUsageError(`'year' must be 2015, 2016, or 2017`);
+if (!year || year % 1 !== 0 || year < 2015 || year > FINAL_YEAR) {
+  printUsageError(`'year' must be 2015 - ${FINAL_YEAR}`);
   process.exit();
 }
 
@@ -132,10 +196,10 @@ if (!day || day % 1 !== 0 || day < 1 || day > 25) {
 if (part === undefined) {
   // Default to part 1.
   part = 1;
-} else if(action === 'make') {
+} else if(['make', 'getInput'].contains(action)) {
   // Part was provided with 'make' action (has no effect).
   console.log(
-    `'part' is meaningless for the 'make' action; it will be ignored`
+    `'part' is meaningless for action ${action}; it will be ignored`
   );
 } else if(!part || part % 1 !== 0 || part < 1 || part > 2) {
   printUsageError(`'part' must be 1 or 2`);
@@ -143,12 +207,4 @@ if (part === undefined) {
 }
 
 // Done validating, now run!
-if (action === 'make') {
-  actions.make(year, day);
-} else if (action === 'run') {
-  actions.run(year, day, part);
-} else {
-  // Should never happen.
-  printUsageError(`You really screwed up. Action ${action} isn't allowed.`);
-  process.exit();
-}
+actions[action](year, day, part);

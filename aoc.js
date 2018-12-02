@@ -26,7 +26,8 @@ const createCodeFileBody = (year, day) =>
 `// Tom Scallon. Advent of Code ${year}, day ${day}.
 
 // Read in input.
-const input = require('fs').readFileSync(__dirname + '/input.txt', 'utf8');
+const input = require('fs').readFileSync(__dirname + '/input.txt', 'utf8').trim();
+const lines = input.split('\\n');
 
 // Part 1 code.
 const p1 = () => {
@@ -196,7 +197,7 @@ if (!day || day % 1 !== 0 || day < 1 || day > 25) {
 if (part === undefined) {
   // Default to part 1.
   part = 1;
-} else if(['make', 'getInput'].contains(action)) {
+} else if(['make', 'get_input'].includes(action)) {
   // Part was provided with 'make' action (has no effect).
   console.log(
     `'part' is meaningless for action ${action}; it will be ignored`

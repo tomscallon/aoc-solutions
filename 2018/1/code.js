@@ -1,16 +1,28 @@
 // Tom Scallon. Advent of Code 2018, day 1.
 
 // Read in input.
-const input = require('fs').readFileSync(__dirname + '/input.txt', 'utf8');
+const input = require('fs').readFileSync(__dirname + '/input.txt', 'utf8').trim();
+const lines = input.split('\n');
 
 // Part 1 code.
 const p1 = () => {
-  throw 'Not yet implemented';
+  return lines.reduce((sum, el) => sum + +el, 0);
 };
 
 // Part 2 code.
 const p2 = () => {
-  throw 'Not yet implemented';
+  const visited = [0];
+  let current = 0;
+
+  while (true) {
+    for (let el of lines.map(x => +x)) {
+      current += el;
+
+      if (visited.includes(current)) return current;
+
+      visited.push(current);
+    }
+  }
 };
 
 // Export the functions.

@@ -20,7 +20,46 @@ const printUsageError = (message) => console.error(
 const getFolderPath = (year, day) => `./${year}/${day}`;
 const getCodeFilePath = (year, day) => `${getFolderPath(year, day)}/code.js`;
 const getInputFilePath = (year, day) => `${getFolderPath(year, day)}/input.txt`;
-const getAnswerFilePath = (year, day) => `${getFolderPath(year, day)}/last_answer.txt`;
+const getAnswerFilePath = (year, day) => `${getFolderPath(year, day)}/answer.txt`;
+
+// Utilities for working with the answer file.
+class Answer {
+  constructor(str = '{}') {
+    this._data = JSON.parse(str);
+
+    // Ensure required properties.
+    if (!this._data.lastAnswers) {
+      this._data.lastAnswers = [];
+    }
+  }
+
+  static fromFile(path, def) {
+    return new Answer(fs.readFileSync(path, 'utf8'));
+  }
+
+  static readWrite(path, action) {
+    let answer;
+    try {
+      answer = Answer.fromFile(path);
+    } catch (e) {
+      answer = new Answer();
+    }
+    action(answer);
+    writeFile(path, answer.toString());
+  }
+
+  toString() {
+    return JSON.stringify(this._data);
+  }
+
+  getLastAnswer(part) {
+    return this._data.lastAnswers[part - 1];
+  }
+
+  setLastAnswer(part, answer) {
+    this._data.lastAnswers[part - 1] = answer;
+  }
+}
 
 const createCodeFileBody = (year, day) =>
 `// Tom Scallon. Advent of Code ${year}, day ${day}.
@@ -164,8 +203,48 @@ const actions = {
       process.exit();
     }
 
+    // Display the reults.
     console.log(`\nRan: ${year}, day ${day}, part ${part}\nTook: ${time}ms\nResult: ${result}\n`);
-  }
+
+    // Save the result to the answer file.
+    Answer.readWrite(
+      getAnswerFilePath(year, day),
+      a => a.setLastAnswer(part, result),
+    );
+
+    // Potentially submit the answer to the API.
+    console.log('Would you like to submit this answer? (y/n)');
+    prompt.get(['submit'], (err, res) => {
+      if (err) {
+        console.error(`\nHit an error while collecting input: ${err}.`);
+        process.exit();
+      }
+
+      if (['y', 'yes'].includes(res.submit.toLowerCase())) {
+        actions.submit_answer(year, day, part, result);
+      }
+    });
+  },
+  /*submit_answer: (year, day, part, answer = undefined) => {
+    // If no answer's provided, attempt to read it from the file.
+    if (answer === undefined) {
+      let p = getAnswerFilePath(year, day);
+      console.log(`Reading stored answer from ${p}.`);
+      try {
+        let a = Answer.fromFile(p);
+        answer = a.getLastAnswer(part);
+      } catch (e) {
+        console.log(`Failed to read saved answer: ${e.message}`);
+        process.exit();
+      }
+    }
+
+    // Submit to the API.
+    console.log(`Submitting ${answer} as answer for ${year} day ${day} part ${part}`);
+    makeRequest(
+      getSubmitURL(year, day)
+    );
+  },*/
 };
 
 // Validate the action

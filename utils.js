@@ -83,8 +83,8 @@ function* summations(n, x, {unique = false, min = 0, max = x} = {}) {
 /**
  * Enumerates all summations to `x` involving only the numbers in `a`. For
  * example, summationsUsing([4, 3], 16) would yield [3, 3, 3, 3, 4] and
- * [4, 4, 4, 4], along with permutations of those options. We assume `x`, along
- * with every element of `a` to be positive.
+ * [4, 4, 4, 4], along with permutations of those options. We assume `x` and
+ * every element of `a` to be positive.
  *
  * This function is a generator, and should be iterated using `for..of`.
  *
@@ -166,6 +166,20 @@ function* summationsUsing(a, x, {unique = false, repeat: _repeat = true, sorted 
   }
 }
 
+function forEachPair(a, f) {
+  for (let i = 0; i < a.length; i++) {
+    for (let j = 0; j < a.length; j++) {
+      if (i !== j) {
+        if (f([a[i], a[j]], [i, j], a) === false) {
+          return;
+        }
+      }
+    }
+  }
+}
+
+// Provides all possibilities of picking `m` to `n` elements from the given list
+// `a`, without repeating elements. TODO
 function* mToNOf(a, m, n) {
   if (n < 0 || n < m || a.length < m) {
     return;
@@ -176,7 +190,7 @@ function* mToNOf(a, m, n) {
 
   // Decide: is a[0] included?
   // Yes:
-  for (let rest of mToNof(a.slice(1)))
+  for (let rest of mToNof(a.slice(1), m - 1, n - 1)) {}
 
   // No:
 }
@@ -215,4 +229,5 @@ exports.repeat = repeat;
 exports.permutations = permutations;
 exports.summations = summations;
 exports.summationsUsing = summationsUsing;
+exports.forEachPair = forEachPair;
 exports.crossProduct = crossProduct;

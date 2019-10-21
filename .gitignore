@@ -1,4 +1,4 @@
 node_modules/
-*/*/input.txt
+input/
 */*/last_answer.txt
 .env

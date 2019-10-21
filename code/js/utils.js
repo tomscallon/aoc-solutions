@@ -92,7 +92,7 @@ function* summations(n, x, {unique = false, min = 0, max = x} = {}) {
  *   `unique` -- if set to `true`, then permutations of options will not be
  *     returned. (Combinations are yielded rather than permutations.) Defaults
  *     to `false`.
- *   `repeat` -- if set to `true`, then numbers provided in `a` cannot be
+ *   `repeat` -- if set to `false`, then numbers provided in `a` cannot be
  *     reused. For example, summationsUsing([4, 3], 16, {repeat = false}) would
  *     yield nothing, as 3 + 4 is 7 (not 16). When `repeat` is `true`, the
  *     elements of `a` are assumed to be unique. Defaults to `true`.

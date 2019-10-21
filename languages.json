@@ -1,0 +1,6 @@
+{
+  "js": {
+    "extension": "js",
+    "run": "node $file"
+  }
+}

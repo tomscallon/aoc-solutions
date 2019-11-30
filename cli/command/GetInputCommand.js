@@ -19,6 +19,9 @@ export default new Command(
   ],
   async ([year, day]) => {
     const input = await makeRequest(getInputURL(year, day));
+
+    if (input = )
+
     await writeFile(getInputFilePath(year, day), input);
   },
 );

@@ -18,12 +18,12 @@
   "author": "Tom Scallon",
   "license": "MIT",
   "dependencies": {
-    "dotenv": "^6.1.0",
-    "fs-extra": "^4.0.3",
+    "dotenv": "^6.2.0",
+    "fs-extra": "^8.1.0",
     "prompt": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.0",
+    "@babel/cli": "^7.7.4",
     "@babel/core": "^7.7.4",
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/plugin-transform-flow-strip-types": "^7.7.4",

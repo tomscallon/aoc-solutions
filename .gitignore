@@ -2,3 +2,4 @@ node_modules/
 input/
 */*/last_answer.txt
 .env
+cli/cli.bundle.js

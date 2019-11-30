@@ -1,6 +1,6 @@
 /* @flow */
 
-import fs from 'fs-extra';
+import fse from 'fs-extra';
 import https from 'https';
 
 export const FIRST_YEAR = 2015;
@@ -54,6 +54,8 @@ export const makeRequest = async (
         },
       },
       response => {
+        console.log(response);
+        
         let data = '';
 
         // Combine chunks into the whole response.
@@ -68,9 +70,12 @@ export const makeRequest = async (
 );
 
 export const writeFile = async (path: string, content: string) => new Promise(
-  (resolve, reject) => fs.writeFile(
+  (resolve, reject) => fse.outputFile(
     path,
     content,
-    err => err ? reject(err) : resolve(),
+    err => {
+      console.log('Err is', err);
+      return err ? reject(err) : resolve()
+    },
   ),
 );

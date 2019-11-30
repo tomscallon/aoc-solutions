@@ -18,10 +18,12 @@ export default new Command(
     Command.Validators.integer(1, 25),
   ],
   async ([year, day]) => {
-    const input = await makeRequest(getInputURL(year, day));
+    const res = await makeRequest(getInputURL(year, day));
 
-    if (input = )
+    if (res.status === 400) {
+      throw new Error('Not logged in');
+    }
 
-    await writeFile(getInputFilePath(year, day), input);
+    await writeFile(getInputFilePath(year, day), res.data);
   },
 );

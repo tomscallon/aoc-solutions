@@ -6,23 +6,6 @@ const fse = require('fs-extra');
 const https = require('https');
 const prompt = require('prompt');
 
-const FINAL_YEAR = 2019;
-
-const printUsageError = (message) => console.error(
-  `Error: ${message}\n\n` +
-  'Proper Usage: ./aoc.js <action> <language> <year> <day> <part>\n' +
-  '  lang:   the implementation to use (only for "make" and "run")' +
-  `  action: ${Object.keys(actions)}\n` +
-  `  year:   2015 to ${FINAL_YEAR}\n` +
-  '  day:    an integer between 1 and 25, inclusive\n' +
-  '  part:   1 or 2 (only for "run")\n'
-);
-
-const getInputFilePath = (year, day) => `${getFolderPath(year, day)}/input.txt`;
-const getFolderPath = (lang, year, day) => `./${lang}/${year}/${day}`;
-const getCodeFilePath = (year, day) => `${getFolderPath(year, day)}/code.js`;
-const getAnswerFilePath = (year, day) => `${getFolderPath(year, day)}/answer.txt`;
-
 // Utilities for working with the answer file.
 class Answer {
   constructor(str = '{}') {
@@ -61,32 +44,6 @@ class Answer {
     this._data.lastAnswers[part - 1] = answer;
   }
 }
-
-// const createCodeFileBody = (year, day) =>
-// `// Tom Scallon. Advent of Code ${year}, day ${day}.
-//
-// // Read in input.
-// const input = require('fs').readFileSync(__dirname + '/input.txt', 'utf8').trim();
-// const lines = input.split('\\n');
-//
-// // Part 1 code.
-// const p1 = () => {
-//   throw 'Not yet implemented';
-// };
-//
-// // Part 2 code.
-// const p2 = () => {
-//   throw 'Not yet implemented';
-// };
-//
-// // Export the functions.
-// exports[1] = p1;
-// exports[2] = p2;`;
-
-// const AOC_DOMAIN = 'https://adventofcode.com';
-// const getDayURL = (year, day) => `${AOC_DOMAIN}/${year}/day/${day}`;
-// const getInputURL = (year, day) => `${getDayURL(year, day)}/input`;
-// const getSubmitURL = (year, day) => `${getDayURL(year, day)}/answer`;
 
 const writeFile = (path, content, successCallback = undefined) => fs.writeFile(
   path,
@@ -162,25 +119,6 @@ const actions = {
 
     actions.get_input(year, day);
   },
-  // get_input: (year, day) => {
-  //   const url = getInputURL(year, day);
-  //   const path = getInputFilePath(year, day);
-  //   console.log(`Requesting input for ${year} day ${day} from ${url}`);
-  //   makeRequest(
-  //     url,
-  //     {
-  //       headers: {
-  //         'cookie': `session=${process.env.SESSION_TOKEN};`,
-  //       },
-  //     },
-  //     input => writeFile(
-  //       path,
-  //       input,
-  //       () => console.log(`Successfully wrote input to ${path}`),
-  //     ),
-  //     err => console.log('Failed to get puzzle input: ' + err.message),
-  //   );
-  // },
   run: (year, day, part) => {
     const filePath = getCodeFilePath(year, day);
     let module;

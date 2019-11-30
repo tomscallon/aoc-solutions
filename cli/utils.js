@@ -40,10 +40,14 @@ export const getAnswerFilePath = (
   day: number,
 ): string => `answer/${year}/${day}.json`;
 
+export type Response = {|
+  status: number,
+  data: string,
+|};
 export const makeRequest = async (
   url: string,
   method: 'GET' | 'POST' = 'GET',
-) => new Promise((resolve, reject) =>
+) => new Promise<Response>((resolve, reject) =>
   https
     .request(
       url,
@@ -54,15 +58,16 @@ export const makeRequest = async (
         },
       },
       response => {
-        console.log(response);
-        
         let data = '';
 
         // Combine chunks into the whole response.
         response.on('data', chunk => data += chunk);
 
         // The whole response has been received. Call the success callback.
-        response.on('end', () => resolve(data));
+        response.on('end', () => resolve({
+          status: response.statusCode,
+          data,
+        }));
       },
     )
     .on('error', err => reject(err))
@@ -73,9 +78,6 @@ export const writeFile = async (path: string, content: string) => new Promise(
   (resolve, reject) => fse.outputFile(
     path,
     content,
-    err => {
-      console.log('Err is', err);
-      return err ? reject(err) : resolve()
-    },
+    err => err ? reject(err) : resolve(),
   ),
 );

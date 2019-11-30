@@ -1,10 +1,11 @@
 {
   "name": "advent-of-code-solutions",
   "version": "1.0.0",
+  "private": true,
   "description": "Solutions to Advent of Code puzzles.",
   "main": "aoc.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:cli": "npx webpack --config ./cli/webpack.config.js"
   },
   "keywords": [
     "Advent",
@@ -20,5 +21,15 @@
     "dotenv": "^6.1.0",
     "fs-extra": "^4.0.3",
     "prompt": "^1.0.0"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.4",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/plugin-transform-flow-strip-types": "^7.7.4",
+    "babel-loader": "^8.0.6",
+    "flow-bin": "^0.112.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   }
 }

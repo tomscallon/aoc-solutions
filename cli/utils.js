@@ -80,7 +80,10 @@ export const readFile = async (path: string) => new Promise<string>(
   )
 );
 
-export const writeFile = async (path: string, content: string) => new Promise(
+export const writeFile = async (
+  path: string,
+  content: string,
+) => new Promise<void>(
   (resolve, reject) => fse.outputFile(
     path,
     content,

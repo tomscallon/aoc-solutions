@@ -40,7 +40,7 @@ try {
   time = Date.now() - time;
 } catch (e) {
   console.error(`\nHit an error while running the code: ${e}.\n`);
-  process.exit();
+  process.exit(1);
 }
 
 console.log(`\nResult: ${result}\nTook: ${time}ms`);

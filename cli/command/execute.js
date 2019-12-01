@@ -8,7 +8,8 @@ import Command from './Command';
 // Therefore, to dynamically call a command we need to make sure they're
 // all included in the bundle.
 import GetInputCommand from './GetInputCommand';
-import Run from './RunCommand';
+import MakeSolutionCommand from './MakeSolutionCommand';
+import RunCommand from './RunCommand';
 
 export default async (
   name: string,

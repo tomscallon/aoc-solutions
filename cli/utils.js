@@ -73,7 +73,7 @@ export const makeRequest = async (
     .end()
 );
 
-export const readFile = async (path: string) => new Promise(
+export const readFile = async (path: string) => new Promise<string>(
   (resolve, reject) => fse.readFile(
     path,
     (err, content) => err ? reject(err) : resolve(content.toString()),

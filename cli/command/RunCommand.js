@@ -19,11 +19,7 @@ export default new Command<string>(
   ],
   async ([lang, year, day, part]) => {
     const config = await loadConfig(lang);
-    const result = await config.runSolution(
-      getInputFilePath(year, day),
-      getSolutionFilePath(lang, year, day),
-      part,
-    );
+    const result = await config.runSolution(year, day, part);
 
     return {
       success: true,

@@ -2,7 +2,7 @@
 
 const {execFile} = require('child_process');
 
-import {readFile} from './utils';
+import {readFile, writeFile, getInputFilePath, getSolutionFilePath} from './utils';
 
 export type ExecResult = {|
   stdout: string,
@@ -58,15 +58,26 @@ class LanguageConfig {
     return replace(this._template, {year, day});
   }
 
+  async writeSolution(year: number, day: number): Promise<void> {
+    return await writeFile(
+      getSolutionFilePath(this._name, year, day),
+      this.buildSolutionFile(year, day),
+    );
+  }
+
   async runSolution(
-    inputPath: string,
-    solutionPath: string,
+    year: number,
+    day: number,
     part: number,
   ): Promise<ExecResult> {
     return new Promise(
       (resolve, reject) => execFile(
         getRunPath(this._name),
-        [inputPath, solutionPath, '' + part],
+        [
+          getInputFilePath(year, day),
+          getSolutionFilePath(this._name, year, day),
+          '' + part,
+        ],
         (err, stdout, stderr) => err
           ? reject(err)
           : resolve({

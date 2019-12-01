@@ -5,11 +5,11 @@ const path = require('path');
 
 // Expected arg format: <input file path> <solution file path> <part>
 
-if (process.argv.length !== 5) {
+if (process.argv.length < 5 || process.argv.length > 6) {
   console.error('Expected 3 args, but got %d', process.argv.length - 2);
 }
 
-const [,, inputFile, solutionFile, part] = process.argv;
+const [,, inputFile, solutionFile, part, bench] = process.argv;
 
 if (part !== '1' && part !== '2') {
   console.error(`'part' must be '1' or '2' (instead got '${part}')`);
@@ -31,16 +31,48 @@ try {
   process.exit(1);
 }
 
-let result;
-let time;
-
 try {
-  time = Date.now();
-  result = solution[part]();
-  time = Date.now() - time;
+  if (!bench) {
+    let time = Date.now();
+    let result = solution[part]();
+    time = Date.now() - time;
+    console.log(`\nResult: ${result}\nTook: ${time}ms`);
+  } else {
+    let times = [];
+    let results = [];
+    let benchStart = Date.now();
+    let sol = solution[part];
+
+    while (times < 10 || Date.now() - benchStart < 5000) {
+      let start = Date.now();
+      let result = sol();
+      let end = Date.now();
+      results.push(result);
+      times.push(end - start);
+    }
+
+    // Aggregate results.
+    let aggRes = results.reduce(
+      (a, r) => {
+        r[a] = (r[a] || 0) + 1;
+        return a;
+      },
+      {},
+    );
+
+    console.log(`\nPerformed benchmark (${times.length} runs).`);
+    if (Object.keys(aggRes).length > 1) {
+      console.log('  Not all runs produced the same output! Results below...');
+      for (let res in aggRes) {
+        console.log(`    ${res}\t (${res[aggRes]} times)`);
+      }
+    } else {
+      console.log(`  All runs agreed on the answer: ${results[0]}`);
+    }
+    const avgRuntime = times.reduce((x, y) => x + y, 0) / times.length;
+    console.log(`Average runtime: ${avgRuntime}ms`);
+  }
 } catch (e) {
   console.error(`\nHit an error while running the code: ${e}.\n`);
   process.exit(1);
 }
-
-console.log(`\nResult: ${result}\nTook: ${time}ms`);

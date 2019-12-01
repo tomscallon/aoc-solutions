@@ -69,6 +69,7 @@ class LanguageConfig {
     year: number,
     day: number,
     part: number,
+    benchmark: boolean = false,
   ): Promise<ExecResult> {
     return new Promise(
       (resolve, reject) => execFile(
@@ -77,6 +78,7 @@ class LanguageConfig {
           getInputFilePath(year, day),
           getSolutionFilePath(this._name, year, day),
           '' + part,
+          benchmark ? 'true' : '',
         ],
         (err, stdout, stderr) => err
           ? reject(err)

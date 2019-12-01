@@ -10,6 +10,7 @@ import Command from './Command';
 import GetInputCommand from './GetInputCommand';
 import MakeSolutionCommand from './MakeSolutionCommand';
 import RunCommand from './RunCommand';
+import BenchmarkCommand from './BenchmarkCommand';
 
 export default async (
   name: string,

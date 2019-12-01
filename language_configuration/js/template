@@ -1,7 +1,7 @@
 // Tom Scallon. Advent of Code $year, day $day.
 
 // Read in input.
-const input = require('fs').readFileSync(__dirname + '/input.txt', 'utf8').trim();
+const {input} = process.env;
 const lines = input.split('\\n');
 
 // Part 1 code.

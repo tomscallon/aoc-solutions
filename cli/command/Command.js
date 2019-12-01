@@ -68,12 +68,20 @@ class Command<T> {
     const stringArgs = typeof args === 'string' ? args.split(/\s+/) : args;
 
     try {
+      if (stringArgs.length !== this._validators.length) {
+        return {
+          success: false,
+          error: 'Wrong number of arguments; expected '
+            + `${this._validators.length} but got ${stringArgs.length}`,
+        };
+      }
+
       return await this._execute(this._parseArgs(stringArgs));
     } catch (e) {
       return {
         success: false,
         error: 'Unhandled error while running command ' +
-          `${this._name}': ${e.message}`,
+          `'${this._name}': ${e.message}`,
       };
     }
   }
@@ -99,6 +107,11 @@ Command.Validators.boolean = (arg => {
     reason: 'Arg must be false, f, true, or t',
   }
 }: ArgValidator<boolean>);
+
+Command.Validators.string = (arg => ({
+  valid: true,
+  value: arg,
+}): ArgValidator<string>);
 
 Command.Validators.number = (
   min: ?number = undefined,

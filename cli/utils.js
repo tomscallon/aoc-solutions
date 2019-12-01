@@ -27,18 +27,17 @@ export const getInputFilePath = (
   day: number,
 ): string => `input/${year}/${day}.txt`;
 
+export const getAnswerFilePath = (
+  year: number,
+  day: number,
+): string => `answer/${year}/${day}.json`;
+
 // TODO Look up the extension rather than hardcoding js.
-export const getCodeFilePath = (
+export const getSolutionFilePath = (
   lang: string,
   year: number,
   day: number,
 ): string => `solution/${lang}/${year}/${day}.js`;
-
-export const getAnswerFilePath = (
-  lang: string,
-  year: number,
-  day: number,
-): string => `answer/${year}/${day}.json`;
 
 export type Response = {|
   status: number,
@@ -72,6 +71,13 @@ export const makeRequest = async (
     )
     .on('error', err => reject(err))
     .end()
+);
+
+export const readFile = async (path: string) => new Promise(
+  (resolve, reject) => fse.readFile(
+    path,
+    (err, content) => err ? reject(err) : resolve(content.toString()),
+  )
 );
 
 export const writeFile = async (path: string, content: string) => new Promise(

@@ -8,6 +8,7 @@ import {
   getInputFilePath,
   getInputURL,
   makeRequest,
+  readFile,
   writeFile,
 } from '../utils';
 
@@ -18,6 +19,22 @@ export default new Command<boolean>(
     Command.Validators.integer(1, 25),
   ],
   async ([year, day]) => {
+    const inputFile = getInputFilePath(year, day);
+    let input;
+
+    try {
+      input = await readFile(inputFile);
+    } catch(e) {
+      input = undefined;
+    }
+
+    if (input != null) {
+      return {
+        success: false,
+        error: `Input file '${inputFile}' already exists`,
+      };
+    }
+
     const res = await makeRequest(getInputURL(year, day));
 
     if (res.status !== 200) {

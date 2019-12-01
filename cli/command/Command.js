@@ -5,14 +5,21 @@ export type ArgValidatorResult<+T> = (
   | {+valid: true, +value: T}
 );
 export type ArgValidator<+T> = string => ArgValidatorResult<T>;
+export type Result<+T> = $ReadOnly<
+  | {|success: true, result: T|}
+  | {|success: false, error: string|}
+>;
 
 type ApplyValidator = <T>(ArgValidator<T>) => T;
 
-class Command {
+class Command<T> {
   static Validators = {};
-  static _all: {[string]: Command} = {};
+  static _all: {[string]: Command<any>} = {};
 
-  static _execute = async (name: string, args: string | Array<string>) => {
+  static _execute = async (
+    name: string,
+    args: string | Array<string>,
+  ): Promise<Result<any>> => {
     if (!(name in Command._all)) {
       throw new Error(`Command '${name}' doesn't exist`);
     }
@@ -20,13 +27,14 @@ class Command {
     return await Command._all[name].execute(args);
   };
 
+  _name: string;
   _validators: Array<ArgValidator<*>>;
-  _execute: Array<*> => Promise<?string>;
+  _execute: Array<*> => Promise<Result<T>>;
 
-  constructor<T: Array<any>>(
+  constructor<V: Array<any>>(
     name: string,
-    validators: T,
-    execute: $TupleMap<T, ApplyValidator> => Promise<?string>,
+    validators: V,
+    execute: $TupleMap<V, ApplyValidator> => Promise<Result<T>>,
   ) {
     // Store the command globally, or throw if it already exists.
     if (name in Command._all) {
@@ -34,6 +42,7 @@ class Command {
     }
     Command._all[name] = this;
 
+    this._name = name;
     this._validators = validators;
     this._execute = execute;
   }
@@ -55,9 +64,18 @@ class Command {
     return validatorResults.map(r => r.valid ? r.value : null);
   }
 
-  async execute(args: string | Array<string>): Promise<?string> {
+  async execute(args: string | Array<string>): Promise<Result<T>> {
     const stringArgs = typeof args === 'string' ? args.split(/\s+/) : args;
-    return await this._execute(this._parseArgs(stringArgs));
+
+    try {
+      return await this._execute(this._parseArgs(stringArgs));
+    } catch (e) {
+      return {
+        success: false,
+        error: 'Unhandled error while running command ' +
+          `${this._name}': ${e.message}`,
+      };
+    }
   }
 }
 

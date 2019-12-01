@@ -8,6 +8,8 @@ import execute from './command/execute';
 config();
 
 // Run the command.
-execute(process.argv[2], process.argv.slice(3)).catch(e => {
-  console.log('Got an error: ', e);
+execute(process.argv[2], process.argv.slice(3)).then(r => {
+  if (!r.success) {
+    console.error(r.error);
+  }
 });

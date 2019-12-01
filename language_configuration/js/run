@@ -1,0 +1,9 @@
+#! /usr/local/bin/node
+
+// Expected arg format: <solution file path> <input file path>
+
+if (process.argv.length !== 5) {
+  console.error('Expected 3 args, but got %d', process.argv.length - 2);
+}
+
+const [,, solutionFile, inputFile] = process.argv;

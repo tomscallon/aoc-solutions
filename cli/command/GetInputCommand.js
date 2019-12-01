@@ -11,7 +11,7 @@ import {
   writeFile,
 } from '../utils';
 
-export default new Command(
+export default new Command<boolean>(
   'get-input',
   [
     Command.Validators.integer(FIRST_YEAR, FINAL_YEAR),
@@ -20,10 +20,17 @@ export default new Command(
   async ([year, day]) => {
     const res = await makeRequest(getInputURL(year, day));
 
-    if (res.status === 400) {
-      throw new Error('Not logged in');
+    if (res.status !== 200) {
+      return {
+        success: false,
+        error: `Failed to fetch input (${res.status}): ${res.data}`,
+      };
     }
 
     await writeFile(getInputFilePath(year, day), res.data);
+    return {
+      success: true,
+      result: true,
+    };
   },
 );

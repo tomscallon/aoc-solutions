@@ -1,5 +1,7 @@
 /* @flow */
 
+import type {Result} from './Command';
+
 import Command from './Command';
 
 // Commands are only registered if we include the file that defines them.
@@ -7,5 +9,7 @@ import Command from './Command';
 // all included in the bundle.
 import GetInputCommand from './GetInputCommand';
 
-export default (name: string, args: string | Array<string>) =>
-  Command._execute(name, args);
+export default async (
+  name: string,
+  args: string | Array<string>,
+): Promise<Result<any>> => await Command._execute(name, args);

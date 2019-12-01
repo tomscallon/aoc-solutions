@@ -33,20 +33,22 @@ try {
 
 try {
   if (!bench) {
-    let time = Date.now();
+    let time = process.hrtime.bigint();
     let result = solution[part]();
-    time = Date.now() - time;
-    console.log(`\nResult: ${result}\nTook: ${time}ms`);
+    time = process.hrtime.bigint() - time;
+    console.log(`\nResult: ${result}\nTook: ${time}ns`);
   } else {
     let times = [];
     let results = [];
-    let benchStart = Date.now();
     let sol = solution[part];
+    let benchStart = Date.now();
+    const MIN_TIME_MS = 5000;
+    const MIN_RUNS = 100;
 
-    while (times < 10 || Date.now() - benchStart < 5000) {
-      let start = Date.now();
+    while (times < MIN_RUNS || Date.now() - benchStart < MIN_TIME_MS) {
+      let start = process.hrtime.bigint();
       let result = sol();
-      let end = Date.now();
+      let end = process.hrtime.bigint();
       results.push(result);
       times.push(end - start);
     }
@@ -69,8 +71,8 @@ try {
     } else {
       console.log(`  All runs agreed on the answer: ${results[0]}`);
     }
-    const avgRuntime = times.reduce((x, y) => x + y, 0) / times.length;
-    console.log(`Average runtime: ${avgRuntime}ms`);
+    const avgRuntime = times.reduce((x, y) => x + y, 0n) / BigInt(times.length);
+    console.log(`Average runtime: ${avgRuntime}ns`);
   }
 } catch (e) {
   console.error(`\nHit an error while running the code: ${e}.\n`);

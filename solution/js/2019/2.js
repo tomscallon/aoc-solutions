@@ -1,21 +1,9 @@
 // Tom Scallon. Advent of Code 2019, day 2.
+const intcode = require('./intcode');
 
 // Read in input.
 const {input} = process.env;
 const nums = input.split(',').map(Number);
-
-const intcode = nums => {
-  let ind = 0;
-  while (nums[ind] != 99) {
-    let [a, b, r] = nums.slice(ind + 1, ind + 4);
-    nums[r] = nums[ind] === 1
-     ? nums[a] + nums[b]
-     : nums[a] * nums[b];
-    ind += 4;
-  }
-
-  return nums;
-};
 
 const intcodeWithParams = (noun, verb) => {
   const inst = [...nums];

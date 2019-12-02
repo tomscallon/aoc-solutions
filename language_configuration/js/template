@@ -2,7 +2,7 @@
 
 // Read in input.
 const {input} = process.env;
-const lines = input.split('\\n');
+const lines = input.split('\n');
 
 // Part 1 code.
 const p1 = () => {

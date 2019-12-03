@@ -16,17 +16,14 @@ const DIFFS = {
 };
 
 const iteratePositions = (wire, fn) => {
-  let pos = {x: 0, y: 0};
+  let x = 0, y = 0;
   let dist = 0;
 
   wire.forEach(({d, a}) => {
     const diff = DIFFS[d];
 
     for (let i = 0; i < a; i++) {
-      fn(pos = {
-        x: pos.x + diff.x,
-        y: pos.y + diff.y,
-      }, ++dist);
+      fn(x += diff.x, y += diff.y, ++dist);
     }
   });
 };
@@ -35,11 +32,11 @@ const iteratePositions = (wire, fn) => {
 const p1 = () => {
   const all = {};
 
-  iteratePositions(wires[0], ({x, y}) => all[`${x},${y}`] = true);
+  iteratePositions(wires[0], (x, y) => all[`${x},${y}`] = true);
   delete all['0,0'];
 
   let closest = null;
-  iteratePositions(wires[1], ({x, y}) => {
+  iteratePositions(wires[1], (x, y) => {
     const key = `${x},${y}`;
     if (key in all) {
       const dist = Math.abs(x) + Math.abs(y);
@@ -56,7 +53,7 @@ const p1 = () => {
 const p2 = () => {
   const all = {};
 
-  iteratePositions(wires[0], ({x, y}, dist) => {
+  iteratePositions(wires[0], (x, y, dist) => {
     const key = `${x},${y}`;
     if (!(key in all)) {
       all[key] = dist;
@@ -65,7 +62,7 @@ const p2 = () => {
   delete all['0,0'];
 
   let closest = null;
-  iteratePositions(wires[1], ({x, y}, dist) => {
+  iteratePositions(wires[1], (x, y, dist) => {
     const key = `${x},${y}`;
     if (key in all) {
       const totalDist = all[key] + dist;

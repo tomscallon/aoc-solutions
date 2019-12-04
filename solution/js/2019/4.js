@@ -4,18 +4,10 @@
 const {input} = process.env;
 const [start, end] = input.split('-').map(Number);
 
+const F = require('./fn');
+
 // Part 1 code.
-const twoAdjacentSame = n => {
-  let s = n + '';
-
-  for (let i = 0; i < s.length - 1; i++) {
-    if (s[i] == s[i + 1]) {
-      return true;
-    }
-  }
-
-  return false;
-};
+const twoAdjacentSame = n => /(\d)\1/.test(n);
 
 const increasing = n => {
   let s = n + '';
@@ -29,38 +21,23 @@ const increasing = n => {
   return true;
 };
 
-const p1 = () => {
-  let total = 0;
-  for (let x = start; x <= end; x++) {
-    if (twoAdjacentSame(x) && increasing(x)) {
-      total++;
-    }
-  }
-  return total;
-};
+const p1 = () => F.collect(
+  F.genFilter(
+    F.all(twoAdjacentSame, increasing)
+  )(F.range(end + 1, start)),
+).length;
 
 // Part 2 code.
-const strictTwoAdjacentSame = n => {
-  let s = n + '';
+const strictTwoAdjacentSame = n =>
+  F.allMatches(n + '', /(\d)\1*/g)
+    .filter(x => x[0].length === 2)
+    .length > 0;
 
-  for (let i = 0; i < s.length - 1; i++) {
-    if (s[i] == s[i + 1] && s[i - 1] != s[i] && s[i + 2] != s[i]) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-const p2 = () => {
-  let total = 0;
-  for (let x = start; x <= end; x++) {
-    if (strictTwoAdjacentSame(x) && increasing(x)) {
-      total++;
-    }
-  }
-  return total;
-};
+const p2 = () => F.collect(
+  F.genFilter(
+    F.all(strictTwoAdjacentSame, increasing)
+  )(F.range(end + 1, start)),
+).length;
 
 // Export the functions.
 exports[1] = p1;

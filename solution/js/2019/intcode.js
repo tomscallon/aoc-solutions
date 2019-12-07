@@ -1,5 +1,7 @@
 const getVal = (v, m, mem) => m == '0' ? +mem[v] : v;
 
+const AWAITING_INPUT = {};
+
 /**
  * Set of instructions understood in intcode.
  *
@@ -31,15 +33,18 @@ const OPS = {
   },
   3: {
     np: 1,
-    run: (mem, [[o]]) => {
-      mem[o] = '5';
+    run: (mem, [[o]], _, inputs) => {
+      if (inputs.length === 0) {
+        return AWAITING_INPUT;
+      }
+      mem[o] = inputs.shift();
       return true;
     }
   },
   4: {
     np: 1,
     run: (mem, [[o]]) => {
-      console.error(mem[o]);
+      console.error(o);
       return mem[o];
     }
   },
@@ -77,9 +82,10 @@ const OPS = {
   }
 };
 
-module.exports = function(memory) {
+module.exports = function*(memory, inputs) {
   let ip = 0;
   let cont = true;
+  const outputs = [];
 
   while (cont) {
     const inst = memory[ip];
@@ -89,6 +95,7 @@ module.exports = function(memory) {
     //console.log(ip, inst, opcode, paramModes, memory.slice(0, 10));
     const {np, run} = OPS[opcode];
     let ipset = false;
+    //console.error('Inputs are', inputs);
     cont = run(
       memory,
       memory
@@ -98,17 +105,27 @@ module.exports = function(memory) {
         ip = newip;
         ipset = true;
       },
+      inputs,
     );
+
+    if (cont === AWAITING_INPUT) {
+      //console.error('Awaiting input');
+      const newIn = yield outputs;
+      console.log('Got input', newIn);
+      inputs.push(newIn);
+      //throw new Error('asdfasd');
+      continue;
+    }
 
     if (!ipset) {
       ip += np + 1;
     }
 
     if (typeof cont !== 'boolean') {
-      console.log(cont);
+      outputs.push(cont);
       cont = true;
     }
   }
 
-  return memory;
+  return [memory, outputs];
 }

@@ -19,7 +19,6 @@ const OPS = {
   1: {
     np: 3,
     run: (mem, [[o1, m1], [o2, m2], [r]]) => {
-      //console.error(r, [o1, m1], getVal(o1, m1, mem), [o2, m2], getVal(o2, m2, mem));
       mem[r] = '' + (getVal(o1, m1, mem) + getVal(o2, m2, mem));
       return true;
     }
@@ -44,7 +43,6 @@ const OPS = {
   4: {
     np: 1,
     run: (mem, [[o]]) => {
-      console.error(o);
       return mem[o];
     }
   },
@@ -109,11 +107,8 @@ module.exports = function*(memory, inputs) {
     );
 
     if (cont === AWAITING_INPUT) {
-      //console.error('Awaiting input');
       const newIn = yield outputs;
-      console.log('Got input', newIn);
       inputs.push(newIn);
-      //throw new Error('asdfasd');
       continue;
     }
 

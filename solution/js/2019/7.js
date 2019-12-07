@@ -59,9 +59,7 @@ const tryCircularAmplifier = args => {
 
   while (true) {
     for (let i = 0; i < amps.length; i++) {
-      //console.error('Passing input', res, i, amps[i]);
       const state = amps[i].next(res);
-      //console.error('Got state', state);
       res = state.value.pop();
 
       if (Array.isArray(res)) {

@@ -4,30 +4,15 @@
 const {input} = process.env;
 
 // Part 1 code.
-const parseImage = (input, w, h) => {
-  const layers = [];
+const parseImage = (input, w, h) => [...Array(input.length / (w * h))]
+  .map((_, i) => input
+    .substring(i * w * h, (i + 1) * w * h)
+    .replace(RegExp(`.{${w}}`, 'g'), x => `${x}\n`)
+  );
 
-  let i = 0;
-  while (i < input.length) {
-    let layer = '';
-
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        layer += input[i++];
-      }
-
-      layer += '\n';
-    }
-
-    layers.push(layer.trim());
-  }
-
-  return layers;
-};
-
-const countDigit = i => layer => Array.prototype.filter.call(
-  layer,
-  c => c == i,
+const countDigit = i => layer => layer.replace(
+  RegExp(`[^${i}]`, 'g'),
+  ''
 ).length;
 
 const p1 = () => {

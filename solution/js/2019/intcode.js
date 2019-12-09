@@ -1,4 +1,11 @@
-const getVal = (v, m, mem) => m == '0' ? +mem[v] : v;
+const getVal = (v, m, mem) => m == '0'
+  ? +mem[v] || 0
+  : m === '1'
+  ? v
+  : +mem[v + mem.rb] || 0;
+
+const getSetAddress = (v, m, mem) =>
+  m == '0' ? v : v + mem.rb;
 
 const AWAITING_INPUT = {};
 
@@ -18,32 +25,32 @@ const AWAITING_INPUT = {};
 const OPS = {
   1: {
     np: 3,
-    run: (mem, [[o1, m1], [o2, m2], [r]]) => {
-      mem[r] = '' + (getVal(o1, m1, mem) + getVal(o2, m2, mem));
+    run: (mem, [[o1, m1], [o2, m2], [r, mr]]) => {
+      mem[getSetAddress(r, mr, mem)] = '' + (getVal(o1, m1, mem) + getVal(o2, m2, mem));
       return true;
     }
   },
   2: {
     np: 3,
-    run: (mem, [[o1, m1], [o2, m2], [r]]) => {
-      mem[r] = '' + (getVal(o1, m1, mem) * getVal(o2, m2, mem));
+    run: (mem, [[o1, m1], [o2, m2], [r, mr]]) => {
+      mem[getSetAddress(r, mr, mem)] = '' + (getVal(o1, m1, mem) * getVal(o2, m2, mem));
       return true;
     }
   },
   3: {
     np: 1,
-    run: (mem, [[o]], _, inputs) => {
+    run: (mem, [[o, m]], _, inputs) => {
       if (inputs.length === 0) {
         return AWAITING_INPUT;
       }
-      mem[o] = inputs.shift();
+      mem[getSetAddress(o, m, mem)] = inputs.shift();
       return true;
     }
   },
   4: {
     np: 1,
-    run: (mem, [[o]]) => {
-      return mem[o];
+    run: (mem, [[o, m]]) => {
+      return getVal(o, m, mem);
     }
   },
   5: {
@@ -52,6 +59,7 @@ const OPS = {
       if (getVal(o1, m1, mem)) {
         setip(getVal(o2, m2, mem));
       }
+      return true;
     }
   },
   6: {
@@ -60,18 +68,28 @@ const OPS = {
       if (!getVal(o1, m1, mem)) {
         setip(getVal(o2, m2, mem));
       }
+      return true;
     }
   },
   7: {
     np: 3,
-    run: (mem, [[o1, m1], [o2, m2], [r]]) => {
-      mem[r] = getVal(o1, m1, mem) < getVal(o2, m2, mem) ? 1 : 0;
+    run: (mem, [[o1, m1], [o2, m2], [r, mr]]) => {
+      mem[getSetAddress(r, mr, mem)] = getVal(o1, m1, mem) < getVal(o2, m2, mem) ? 1 : 0;
+      return true;
     },
   },
   8: {
     np: 3,
-    run: (mem, [[o1, m1], [o2, m2], [r]]) => {
-      mem[r] = getVal(o1, m1, mem) == getVal(o2, m2, mem) ? 1 : 0;
+    run: (mem, [[o1, m1], [o2, m2], [r, mr]]) => {
+      mem[getSetAddress(r, mr, mem)] = getVal(o1, m1, mem) == getVal(o2, m2, mem) ? 1 : 0;
+      return true;
+    },
+  },
+  9: {
+    np: 1,
+    run: (mem, [[o1, m1]], _ip, _in, adjustrb) => {
+      adjustrb(getVal(o1, m1, mem));
+      return true;
     },
   },
   99: {
@@ -85,15 +103,16 @@ module.exports = function*(memory, inputs) {
   let cont = true;
   const outputs = [];
 
+  // HACK!
+  memory.rb = 0;
+
   while (cont) {
     const inst = memory[ip];
     const opcode = +inst.substring(inst.length - 2);
     const paramModes = inst.substring(0, inst.length - 2)
-      .split('').reverse().join('');
-    //console.log(ip, inst, opcode, paramModes, memory.slice(0, 10));
+      .split('').reverse();
     const {np, run} = OPS[opcode];
     let ipset = false;
-    //console.error('Inputs are', inputs);
     cont = run(
       memory,
       memory
@@ -104,6 +123,7 @@ module.exports = function*(memory, inputs) {
         ipset = true;
       },
       inputs,
+      val => memory.rb += val,
     );
 
     if (cont === AWAITING_INPUT) {

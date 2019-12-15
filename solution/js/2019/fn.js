@@ -97,6 +97,18 @@ const F = {
     }
   },
 
+  powerset: function*([head, ...tail]) {
+    if (tail.length === 0) {
+      yield [];
+      yield [head];
+    } else {
+      for (const tailSet of F.powerset(tail)) {
+        yield tailSet;
+        yield [head, ...tailSet];
+      }
+    }
+  },
+
   // Powerful function for iterating the cross product
   // of multiple provided generators. Understands both
   // arrays and objects; the yielded result will match

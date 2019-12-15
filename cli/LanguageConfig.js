@@ -77,7 +77,7 @@ class LanguageConfig {
         [
           getInputFilePath(year, day),
           getSolutionFilePath(this._name, year, day),
-          '' + part,
+          String(part),
           benchmark ? 'true' : '',
         ],
         (err, stdout, stderr) => err
